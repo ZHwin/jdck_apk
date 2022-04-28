@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="utf-8">
+	<title>Webview Example</title>
+	<style>
+	.button {position: relative;    background-color: #4CAF50;    border: none;    font-size: 28px;    color: #FFFFFF;    padding: 20px;    width: 200px;    text-align: center;    -webkit-transition-duration: 0.4s; /* Safari */    transition-duration: 0.4s;    text-decoration: none;    overflow: hidden;    cursor: pointer;}.button:after {    content: '';    background: #90EE90;    display: block;    position: absolute;    padding-top: 300%;    padding-left: 350%;    margin-left: -20px!important;    margin-top: -120%;    opacity: 0;    transition: all 0.8s}.button:active:after {    padding: 0;    margin: 0;    opacity: 1;    transition: 0s}
+	</style>
+	<script type="text/javascript">
+var nw=null;
+// H5 plus事件处理
+function plusReady(){
+	createWebview();
+}
+if(window.plus){
+	plusReady();
+}else{
+	document.addEventListener('plusready', plusReady, false);
+}
+
+// 创建Webview窗口监听侧滑返回事件
+function createWebview(){
+	// 打开新窗口
+	nw=plus.webview.create('https://plogin.m.jd.com/login/login?appid=300&returnurl=https%3A%2F%2Fwq.jd.com%2Fpassport%2FLoginRedirect%3Fstate%3D2431230387%26returnurl%3Dhttps%253A%252F%252Fhome.m.jd.com%252FmyJd%252Fhome.action&source=wq_passport', '', {top:'0px',bottom:'80px'});
+}
+// 显示Webview窗口
+function showWebview(){
+	nw.show('slide-in-right');
+}
+// 获取ck
+function getJdCk(){
+var ck = plus.navigator.getCookie('https://m.jd.com/');
+if(ck){
+var ckarr = ck.split(";");
+var pt_key = null;
+var pt_pin = null;
+for (let i = 0; i < ckarr.length; i++) {
+        if (ckarr[i].trim().startsWith('pt_key')) {
+            pt_key = ckarr[i]
+        }
+        if (ckarr[i].trim().startsWith('pt_pin')) {
+            pt_pin = ckarr[i]
+        }
+    }
+ var newCK = pt_key + ";" + pt_pin + ";";
+if(pt_key){
+plus.nativeUI.confirm(newCK, function(event) {
+	var tapIndex = event.index;
+	switch (tapIndex) {
+		case 0 : 
+			var Context = plus.android.importClass("android.content.Context");
+			 var main = plus.android.runtimeMainActivity();
+			 var clip = main.getSystemService(Context.CLIPBOARD_SERVICE);
+			  plus.android.invoke(clip, "setText", newCK);
+			   plus.nativeUI.toast('已成功复制到剪贴板');
+
+			break;
+		case 1 : 
+		var Context = plus.android.importClass("android.content.Context");
+		 var main = plus.android.runtimeMainActivity();
+		 var clip = main.getSystemService(Context.CLIPBOARD_SERVICE);
+		  plus.android.invoke(clip, "setText", newCK);
+				plus.runtime.openURL('mqq://im/chat?chat_type=wpa&uin=2664545997&version=1&src_type=web ' ,function (res) {
+							plus.nativeUI.alert("本机没有安装QQ，无法启动");
+				});
+			break;
+	
+	}
+}, "提示", ["复制ck", "我要挂豆"]);
+}else{
+	plus.nativeUI.alert("还没登录京东！");
+}	
+}else{
+	plus.nativeUI.alert("还没登录京东！");
+}
+
+
+	 
+}
+function exitjd(){
+	plus.storage.clear();
+	plus.cache.clear();
+	
+	plus.navigator.removeAllCookie();
+	nw.show('slide-in-right');
+	plus.nativeUI.toast('退出成功');
+	
+}
+// 关闭窗口
+function closeWebview(){
+	nw.close();
+	plus.webview.currentWebview().close();
+}
+	</script>
+	</head>
+	<body>
+
+		
+		<h1 style="text-align: center;">免责声明</h1>
+		<div style="font-size: 26px;color: #d6251f">
+				<p>一. 本软件完全出于个人兴趣爱好，由本人在业余时间开发,对任何使用者不收取任何费用.是一款安全，绿色，可靠的软件产品。 </p><p>二. 利用本软件所做出的任何软件作品，和本人无关。 </p><p>三. 因使用本软件而引致的任何意外、疏忽、合约毁坏、诽谤、版权或知识产权侵犯及其所造成的任何损失，本人概不负责，亦概不承担任何民事或刑事法律责任。</p><p>四. 当你第一次开始使用本人所提供的任何软件及资源的那一刻起就将被视为对本声明全部内容的认可。同时您必须认可上述免责条款，方可使用本软件及资源。如有任何异议，建议立刻删除本软件及资源并且停止使用。</p><p>五.本产品中的部分免费软件来源于互联网，由于某些原因我们没能联系上免费软件作者，如果软件作者对使用本产品提供下载、更新有任何异议，都欢迎与我联系沟通。</p><p>六.本软件收集于互联网，分享目的仅供大家学习与参考，不得用于非法或盈利行为，任何单位或个人认为通过本产品提供的软件可能涉嫌侵犯其合法权益，请联系邮箱侵删。</p><p>七. 以上内容，本人保留最终解释权。</p>
+		</div>
+		<div style="position: fixed;  bottom: 50px;width: 100%;text-align: center;">
+			&nbsp;
+		<button class="button" onclick="showWebview()">登录京东</button>
+		&nbsp;
+		<button class="button" onclick="getJdCk()">获取ck</button>
+		&nbsp;
+		<button class="button" onclick="exitjd()">退出京东</button>
+		&nbsp;
+		<button class="button" onclick="closeWebview()">关闭软件</button>	
+		</div>
+	</body>
+</html>
